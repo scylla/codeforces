@@ -1,3 +1,5 @@
+// http://www.spoj.com/problems/MARTIAN/
+
 #include <cmath>
 #include <map>
 #include <vector>
@@ -22,12 +24,11 @@
 #include <list>
 #include <fstream>
 #include <algorithm>
-#include <unordered_map>
 #define mp(a, b) make_pair(a,b)
 #define F first
 #define S second
 #define eb(x) emplace_back(x)
-#define set0(A) memset((A), 0, sizeof (A))
+#define setzero(A) memset((A), 0, sizeof (A))
 #define fast_io ios_base::sync_with_stdio(0); cin.tie(0);
 
 using namespace std;
@@ -46,44 +47,57 @@ typedef vector<string> vs;
 typedef vector<vii> vvp;
 
 const int MOD = 1e9 + 7;
-const ll INF = 1e15 + 7;
-const int NMAX = 4001;
-const int INT_INF = 2*1e9 + 7;
+ll INF = 1e15 + 7;
+int INT_INF = 1e9 + 9;
+const int NMAX = 505;
 
-int dp[NMAX];
-map<vector<int>, int> cmap;
+int m;
+int n;
+int dp[NMAX][NMAX];
+int br[NMAX][NMAX];
+int yr[NMAX][NMAX];
+int brdp[NMAX][NMAX];
+int yrdp[NMAX][NMAX];
+
+void solve() {
+
+	for(int i = 1; i <= n; ++i) {
+		for(int j = 1; j <= m; ++j) {
+			brdp[i][j] = brdp[i-1][j] + br[i][j];
+		}
+	}
+
+	for(int i = 1; i <= n; ++i) {
+		for(int j = 1; j <= m; ++j) {
+			yrdp[i][j] = yrdp[i][j-1] + yr[i][j];
+		}
+	}
+
+	for(int i = 1; i <= n; ++i) {
+		for(int j = 1; j <= m; ++j) {
+			dp[i][j] = max(brdp[i][j] + dp[i][j-1], yrdp[i][j] + dp[i-1][j]);
+ 		}
+	}
+
+	cout << dp[n][m] << endl;
+}
 
 int main() {
-  fast_io
-  int T;
-  cin >> T;
-  string s;
-  for(int t = 1; t <= T; ++t) {
-  	cout << "Case #" << t << ": ";
-  	int N, M;
-    cin >> N >> M;
-    cmap.clear();
-    for(int i = 0; i < N; ++i) {
-      cin >> s;
-      vector<int> A(26, 0);
-      for(char ch : s) A[ch - 'a']++;
-      cmap[A]++;
-    }
-    for(int i = 0; i < M; ++i) {
-      cin >> s;
-      dp[0] = 1;
-      for(int j = 0; j < s.size(); ++j) {
-        dp[j+1] = 0;
-        vector<int> A(26, 0);
-        for(int k = 0; k < 20 && j-k >= 0; ++k) {
-          A[s[j-k] - 'a']++;
-          auto it = cmap.find(A);
-          if(it != cmap.end()) dp[j+1] = (dp[j+1] + ((ll)dp[j-k]*(ll)it->second) % MOD) % MOD;
-        }
-      }
-      cout << dp[s.size()] << " ";
-    }
-    cout << endl;
-  }
+	fast_io
+	while(true) {
+		cin >> n >> m;
+		if(n == 0 || m == 0) break;
+		for(int i = 1; i <= n; ++i) {
+			for(int j = 1; j <= m; ++j) {
+				cin >> yr[i][j];
+			}
+		}
+		for(int i = 1; i <= n; ++i) {
+			for(int j = 1; j <= m; ++j) {
+				cin >> br[i][j];
+			}
+		}
+		solve();
+	}
 	return 0;
 }

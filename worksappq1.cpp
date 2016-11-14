@@ -18,16 +18,13 @@ map<int, vector<bool>> groupMap; // all blocks in a group true if a block is in 
 int lastGroup; // to track lastly created group
 
 inline bool isPartitioned(int K) {
-	cout << "partitioned " << lastGroup << " | " << K << endl;
 	return lastGroup + 1 == K;
 }
 
 void updateGroups(vector<string>& blocks, int checkBit, int K) {
-	cout << "check bit " << checkBit << " K " << K << " -- " << lastGroup << endl;
 	int lastGroupId = lastGroup;
 	for(int grpIdx = 0; grpIdx <= lastGroupId; ++grpIdx) {
 		if(groupCount[grpIdx] < 2) continue;
-		cout << "lastGroup " << lastGroup << endl;
 		bool grpUpdated = false;
 		for(int blkIdx = 0; blkIdx < K; ++blkIdx) {
 			// update group of elements for which bit is zero
@@ -42,19 +39,6 @@ void updateGroups(vector<string>& blocks, int checkBit, int K) {
 		if(grpUpdated) lastGroup++;
 		if(lastGroup + 1 == K) break;
 	}
-	cout << "groups updated exiting .. last group is now " << lastGroup << endl;
-}
-
-void printItemsPerGrp(int K, int bsize) {
-	cout << "------------------- items ---------------------------- " << endl;
-	for(int i = 0; i < K; ++i) {
-		int citem = 0;
-		for(int j = 0; j < bsize; ++j) {
-			if(groupMap[i][j]) citem++;
-		}
-		cout << citem << endl;
-	}
-	cout << "------------------- end ---------------------------- " << endl;
 }
 
 int getMinBits(vector<string>& blocks, int K) {
@@ -63,31 +47,18 @@ int getMinBits(vector<string>& blocks, int K) {
 	int numBits = blocks[0].size();
 	vector<bool> usedBits(numBits, false); // bits used till now for partition
 	vector<int> bitEntropy(numBits); // entropy for current bit
-	cout << "in getminbits " << numBits << endl;
 
 	while(!isPartitioned(K)) {
-
-		printItemsPerGrp(K, K);
 		int nextBit = -1;
 		int maxChange = 0;
 		fill(bitEntropy.begin(), bitEntropy.end(), 0);
-
 		for(int grpIdx = 0; grpIdx < K; ++grpIdx) {
-
 			if(groupCount[grpIdx] > 1) {
-
-				cout << "active group " << grpIdx << " num elements " << groupCount[grpIdx] << endl;
-
-				//if(grpIdx == 1) return 100;
-
 				vector<int> grpEntropy(numBits, 0); // add count of ones
-
 				for(int blkIdx = 0; blkIdx < K; ++blkIdx) {
-					cout << "grp -- block " << grpIdx << " || " << blkIdx << " -- " << groupMap[grpIdx][blkIdx] << endl;
 					if(groupMap[grpIdx][blkIdx]) {
 						for(int bitIdx = 0; bitIdx < numBits; ++bitIdx) {
 							grpEntropy[bitIdx] += (blocks[blkIdx][bitIdx] - '0');
-							cout << "entropy " << grpEntropy[bitIdx] << endl;
 						}
 					}
 				}
@@ -95,12 +66,10 @@ int getMinBits(vector<string>& blocks, int K) {
 				// update current entropy
 				for(int bitIdx = 0; bitIdx < numBits; ++bitIdx) {
 					bitEntropy[bitIdx] = min(grpEntropy[bitIdx], groupCount[grpIdx] - grpEntropy[bitIdx]);
-					cout << "entropy updated " << bitEntropy[bitIdx] << endl;
 				}
 
 			}
 		}
-
 
 		// get best bit for partition
 		for(int bitIdx = 0; bitIdx < numBits; ++bitIdx) {
@@ -112,22 +81,16 @@ int getMinBits(vector<string>& blocks, int K) {
 			}
 		}
 
-		//if(nextBit == -1) return 2000;
-		cout << "next bit to set " << nextBit << endl;
 		// update bits used
 		usedBits[nextBit] = true;
 		updateGroups(blocks, nextBit, K);
-		printItemsPerGrp(K, K);
-		//return -1000;
 	}
-	cout << "bits set " << endl;
+
 	for(int idx = 0; idx < numBits; ++idx) {
 		if(usedBits[idx])  {
 			minBits++;
-			cout << idx << " ";
 		}
 	}
-	cout << "--------------------------" << endl;
 	return minBits;
 }
 
@@ -135,7 +98,6 @@ int main() {
 	fast_io
 	int N, M, K;
 	cin >> N >> M >> K;
-	cout << N << " " << M << " " << K << endl;
 	vector<string> blocks(K);
 	groupCount.resize(K, 0);
 	// initialize group map
@@ -156,7 +118,6 @@ int main() {
 			cin >> str;
 			blocks[idx] += str; // each row combined into a single string
 		}
-		cout << "input " << idx << " " << blocks[idx] << endl;
 	}
 	cout << getMinBits(blocks, K) << endl;
 	return 0;

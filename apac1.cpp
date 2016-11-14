@@ -46,12 +46,32 @@ typedef vector<vii> vvp;
 
 const int MOD = 1e9 + 7;
 const ll INF = 1e15 + 7;
-const int NMAX = 1e5 + 2;
+const int NMAX = 2001;
 const int INT_INF = 2*1e9 + 7;
 
-int arr[NMAX];
+double dp[NMAX][NMAX];
 
 int main() {
-
+	int T;
+	cin >> T;
+	cout << fixed << showpoint;
+  cout << setprecision(8);
+	for(int i = 1; i < NMAX; ++i) {
+		dp[i][0] = 1;
+	}
+	for(int i = 1; i < NMAX; ++i) {
+		for(int j = 1; j < NMAX; ++j) {
+			double pa = (double)i/(i+j);
+			double pb = 1 - pa;
+			if(i > j) {
+				dp[i][j] = pa*dp[i-1][j] + pb*dp[i][j-1];
+			}
+		}
+	}
+	for(int t = 1; t <= T; ++t) {
+		int n, m;
+		cin >> n >> m;
+		cout << "Case #" << t << ": " << dp[n][m] << endl;
+	}
 	return 0;
 }
